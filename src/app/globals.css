@@ -1,0 +1,223 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------------------------------------------------------------------------
+   Typography
+   Red Hat Text and Onest are self-hosted open-source fonts (SIL Open Font
+   License). They are variable fonts, so one file covers the weight range.
+--------------------------------------------------------------------------- */
+@font-face {
+  font-family: "Red Hat Text";
+  src: url("/fonts/red-hat-text-400.woff2") format("woff2");
+  font-weight: 300 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Onest";
+  src: url("/fonts/onest-500.woff2") format("woff2");
+  font-weight: 300 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #242220;
+  --ink: #242220;
+  --muted: #545454;
+  --forest: #112111;
+  --forest-light: #1b6549;
+  --sage: #779d7c;
+  --hero-accent: #84c390;
+  --accent: #2e936f;
+  --cream: #faf9f7;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: "Red Hat Text", system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background-color: #2e936f;
+  color: #ffffff;
+}
+
+@layer components {
+  .eyebrow {
+    font-family: "Onest", "Red Hat Text", sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    line-height: 15px;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+  }
+
+  .section-eyebrow {
+    font-family: "Onest", "Red Hat Text", sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    line-height: 15px;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+    color: #242220;
+  }
+
+  .display-heading {
+    font-family: "Red Hat Text", system-ui, sans-serif;
+    font-weight: 600;
+    letter-spacing: -1px;
+    line-height: 1.2;
+    color: #242220;
+  }
+
+  .cta-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 43px;
+    padding: 10px 26px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 18px;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    color: #ffffff;
+    transition: transform 200ms ease, filter 200ms ease, box-shadow 200ms ease;
+  }
+
+  .cta-pill:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.05);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+  }
+
+  .body-copy {
+    color: #242220;
+    font-size: 14px;
+    line-height: 22.4px;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .text-pretty {
+    text-wrap: pretty;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Motion
+--------------------------------------------------------------------------- */
+@keyframes hero-marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes hero-marquee-reverse {
+  from {
+    transform: translate3d(-50%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes slow-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-marquee {
+  animation: hero-marquee 38s linear infinite;
+  will-change: transform;
+}
+
+.animate-marquee-slow {
+  animation: hero-marquee 55s linear infinite;
+  will-change: transform;
+}
+
+.animate-marquee-reverse {
+  animation: hero-marquee-reverse 55s linear infinite;
+  will-change: transform;
+}
+
+.marquee-host:hover .animate-marquee,
+.marquee-host:hover .animate-marquee-slow,
+.marquee-host:hover .animate-marquee-reverse {
+  animation-play-state: paused;
+}
+
+.animate-slow-spin {
+  animation: slow-spin 32s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .animate-marquee,
+  .animate-marquee-slow,
+  .animate-marquee-reverse,
+  .animate-slow-spin {
+    animation: none !important;
+  }
+
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* Scroll reveal helper: hidden until the observer marks it visible. */
+.reveal {
+  opacity: 0;
+  transform: translate3d(0, 18px, 0);
+  transition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+@media (min-width: 1024px) {
+  .feature-glow {
+    filter: blur(14px);
+  }
+}

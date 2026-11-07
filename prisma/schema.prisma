@@ -1,0 +1,262 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model AdminUser {
+  id           String         @id @default(cuid())
+  name         String
+  email        String         @unique
+  passwordHash String
+  role         String         @default("SUPER_ADMIN") // SUPER_ADMIN, EDITOR, SUPPORT
+  active       Boolean        @default(true)
+  sessions     AdminSession[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  @@index([email, active])
+}
+
+model AdminSession {
+  id               String    @id @default(cuid())
+  userId           String
+  user             AdminUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionTokenHash String    @unique
+  expiresAt        DateTime
+  createdAt        DateTime  @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model Service {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  title       String
+  eyebrow     String?
+  summary     String
+  description String
+  heroImage   String?
+  status      String    @default("ACTIVE") // ACTIVE, COMING_SOON, DRAFT
+  featured    Boolean   @default(false)
+  sortOrder   Int       @default(0)
+  benefits    String?   // JSON string of benefits
+  ctaText     String?   @default("Learn More")
+  ctaUrl      String?
+  programs    Program[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([status, sortOrder])
+}
+
+model Program {
+  id           String   @id @default(cuid())
+  serviceId    String?
+  service      Service? @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+  slug         String   @unique
+  title        String
+  description  String
+  priceDisplay String?  // e.g., "$199/mo", "From $249", or empty
+  priceNote    String?
+  currency     String   @default("USD")
+  image        String?
+  features     String?  // JSON string array of features
+  availability String   @default("AVAILABLE") // AVAILABLE, WAITLIST, COMING_SOON
+  active       Boolean  @default(true)
+  sortOrder    Int      @default(0)
+  ctaLabel     String?  @default("Get Started")
+  ctaDestination String? @default("/assessment")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([serviceId])
+  @@index([active, sortOrder])
+}
+
+model ContentPage {
+  id        String   @id @default(cuid())
+  pageKey   String   @unique // "home", "weight-loss", "about", etc.
+  title     String
+  slug      String   @unique
+  status    String   @default("PUBLISHED")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ContentSection {
+  id                String   @id @default(cuid())
+  pageKey           String
+  sectionKey        String
+  sectionType       String   // HERO_DARK, SPLIT_FEATURE, BENEFIT_STRIP, etc.
+  eyebrow           String?
+  title             String?
+  body              String?
+  images            String?  // JSON array of image URLs
+  items             String?  // JSON array of strings or sub-objects
+  ctaLabel          String?
+  ctaHref           String?
+  backgroundVariant String?  @default("default")
+  visible           Boolean  @default(true)
+  sortOrder         Int      @default(0)
+  extra             String?  // JSON string for custom props
+  updatedAt         DateTime @updatedAt
+
+  @@unique([pageKey, sectionKey])
+  @@index([visible, sortOrder])
+}
+
+model Testimonial {
+  id              String   @id @default(cuid())
+  name            String
+  roleOrLocation  String?
+  quote           String
+  image           String?
+  rating          Int      @default(5)
+  serviceCategory String?
+  consentVerified Boolean  @default(false)
+  status          String   @default("PUBLISHED") // PUBLISHED, DRAFT
+  sortOrder       Int      @default(0)
+  showOnHome      Boolean  @default(true)
+  showOnLanding   Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([status, showOnHome, sortOrder])
+}
+
+model FAQ {
+  id        String   @id @default(cuid())
+  pageKey   String   @default("all") // "all", "home", "weight-loss", etc.
+  category  String?  @default("General")
+  question  String
+  answer    String
+  published Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([pageKey, published, sortOrder])
+}
+
+model Lead {
+  id                String    @id @default(cuid())
+  referenceCode     String    @unique
+  serviceId         String?
+  firstName         String
+  lastName          String
+  email             String
+  phone             String?
+  goalCategory      String?
+  message           String?
+  preferredContact  String?   @default("email")
+  source            String?   @default("assessment")
+  status            String    @default("NEW") // NEW, CONTACTED, FOLLOW_UP, QUALIFIED_FOR_CONTACT, CLOSED, SPAM
+  internalNotes     String?
+  consentAcceptedAt DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([status, createdAt])
+  @@index([serviceId])
+}
+
+model Appointment {
+  id            String   @id @default(cuid())
+  name          String
+  email         String
+  phone         String
+  service       String?
+  preferredDate String
+  preferredTime String
+  status        String   @default("REQUESTED") // REQUESTED, CONFIRMED, RESCHEDULE_REQUESTED, CANCELLED, COMPLETED
+  internalNotes String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([status, createdAt])
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String?
+  message   String
+  status    String   @default("UNREAD") // UNREAD, READ, REPLIED, ARCHIVED
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, createdAt])
+}
+
+model MediaAsset {
+  id        String   @id @default(cuid())
+  filename  String
+  url       String
+  alt       String?
+  mimeType  String
+  sizeBytes Int
+  createdAt DateTime @default(now())
+}
+
+model SiteSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+model LegalPage {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  title     String
+  body      String
+  published Boolean  @default(true)
+  updatedAt DateTime @updatedAt
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  adminUserId String?
+  adminName   String?
+  entityType  String
+  entityId    String?
+  action      String
+  summary     String
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([adminUserId])
+}
+
+model NavigationItem {
+  id        String   @id @default(cuid())
+  label     String
+  href      String
+  location  String   @default("HEADER") // HEADER, FOOTER
+  sortOrder Int      @default(0)
+  visible   Boolean  @default(true)
+  external  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([location, visible, sortOrder])
+}
+
+model VerifiedMetric {
+  id        String   @id @default(cuid())
+  label     String
+  value     String
+  source    String?
+  approved  Boolean  @default(true)
+  visible   Boolean  @default(true)
+  sortOrder Int      @default(0)
+  updatedAt DateTime @updatedAt
+}
