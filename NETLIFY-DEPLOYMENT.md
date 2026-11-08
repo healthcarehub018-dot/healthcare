@@ -118,7 +118,42 @@ Verified on 2026-11-08: all public routes 200, `/admin` 307, export API 401, sit
 | 404 on all routes | `output: "export"` was added | Remove it — this app requires SSR |
 | Build fails: Next.js runtime not found | Adapter pinned to old version | Remove `@netlify/plugin-nextjs` from `package.json`/`netlify.toml`; let Netlify manage it |
 
-## 8. Do-not list
+## 8. Removing the "Powered by Netlify" badge
+
+The badge is **not** part of this repository's code. Netlify's edge injects it at request time as
+`<script async src="/.netlify/scripts/hud?variant=public">`, which renders the `nl-badge` button in the
+bottom-right corner. Nothing needs to change in `src/`, the build, or the dependencies.
+
+It is controlled by one per-project setting, `built_with_badge_enabled`. This project (Free plan, created
+after 2026-08-19) had it on by default; it is now **off**:
+
+**UI:** Project configuration → General → **Powered by Netlify badge** → off → Save.
+
+**API/CLI (what was used, non-destructive):**
+
+```bash
+curl -X PATCH "https://api.netlify.com/api/v1/sites/<site-id>" \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{"built_with_badge_enabled": false}'
+```
+
+Verify:
+
+```bash
+curl -s https://suzzmed-healthcare.netlify.app/ | grep -c 'nl-badge\|/.netlify/scripts/hud'   # 0
+```
+
+Notes:
+
+- The change takes effect on the **next request** — no redeploy required.
+- The setting is per project, so other projects on the same team keep their badge.
+- A strict CSP that omits `'unsafe-inline'` from `script-src` also suppresses the badge, but the project
+  setting is the supported mechanism; do not weaken or rely on CSP for this.
+- Verified 2026-11-08: 0 occurrences of `nl-badge` / `/scripts/hud` on `/`, `/about`, `/weight-loss`,
+  `/reviews`, `/how-it-works`, `/terms`, `/faq`, `/privacy`, service pages, while all routes stayed 200.
+
+## 9. Do-not list
 
 - Do **not** run `prisma db push`, `prisma migrate reset`, or seed scripts on Netlify.
 - Do **not** add DB credentials to `NEXT_PUBLIC_*` variables.
