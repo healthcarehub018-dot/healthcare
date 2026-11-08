@@ -1,0 +1,18 @@
+# Netlify configuration — Suzzmed Healthcare (Next.js 14 App Router)
+#
+# Notes:
+# - The current Next.js Runtime (OpenNext-based @netlify/plugin-nextjs v5,
+#   supports Next 13.5+) is installed AUTOMATICALLY by Netlify when it detects
+#   Next.js. Do NOT pin/install the adapter manually — Netlify docs explicitly
+#   recommend not pinning so each build uses the latest maintained runtime.
+# - SSR/Server Actions/Route Handlers are converted to Netlify Functions by
+#   that runtime. Publish dir must be ".next" (the runtime reads build output).
+# - No `output: "export"` in next.config.mjs — site is fully SSR.
+
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  # Match local Node 22 (package-lock v3 / npm 10). Next 14.2 supports >=18.17.
+  NODE_VERSION = "22"

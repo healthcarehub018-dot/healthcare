@@ -6,14 +6,10 @@ import { Footer } from "@/components/marketing/Footer";
 import { ProgramCard } from "@/components/marketing/ProgramCard";
 import { FinalCTA } from "@/components/marketing/FinalCTA";
 import { Check, ArrowRight, ShieldCheck } from "lucide-react";
-import { getServiceBySlug, getSiteSettings, getNavigation, getServices } from "@/lib/data";
+import { getServiceBySlug, getSiteSettings, getNavigation } from "@/lib/data";
 
+export const dynamic = "force-dynamic";
 export const revalidate = 0;
-
-export async function generateStaticParams() {
-  const services = await getServices(false);
-  return services.map((s) => ({ slug: s.slug }));
-}
 
 export default async function ServiceDetailPage({
   params,

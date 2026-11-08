@@ -1,7 +1,9 @@
 # Production Deployment Guide — Suzzmed Healthcare
 
 **Stack:** Next.js 14 (App Router) · Prisma 5.22 · Supabase PostgreSQL 17
-**Companion docs:** `DATABASE-MIGRATION-REPORT.md`, `SUPABASE-SETUP.md`, `DATABASE-VERIFICATION.md`
+**Companion docs:** `NETLIFY-DEPLOYMENT.md`, `SUPABASE-SETUP.md`, `DATABASE-VERIFICATION.md`
+
+> **For Netlify deployment:** See `NETLIFY-DEPLOYMENT.md` for exact build settings, environment variables, and platform-specific guidance. This guide covers platform-agnostic production requirements.
 
 ---
 
@@ -69,6 +71,11 @@ npm start          # or your platform's equivalent
 
 ### Platform notes
 
+- **Netlify:** See `NETLIFY-DEPLOYMENT.md` for complete guide. Key points:
+  - Netlify auto-installs `@netlify/plugin-nextjs` (OpenNext-based) — **do not pin manually**
+  - Build command: `npm run build`, publish dir: `.next` (from `netlify.toml`)
+  - All env vars in Netlify UI (Site Configuration → Environment Variables)
+  - Server Actions, Route Handlers, SSR → Netlify Functions automatically
 - **Vercel/serverless:** use the transaction pooler (IPv4) for `DATABASE_URL`; serverless + direct-URL IPv6 will not connect. Set all env vars in the platform UI, not `.env` files.
 - **VPS/self-host:** `.env` on the server (mode 600), process manager (systemd/pm2), reverse proxy with TLS.
 

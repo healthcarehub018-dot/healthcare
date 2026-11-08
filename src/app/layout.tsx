@@ -7,7 +7,10 @@ export const viewport: Viewport = {
   maximumScale: 5,
 };
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://suzzmed.local";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: "Suzzmed Healthcare | Care Designed Around You",
   description:
     "Evidence-informed telehealth programs tailored to medical weight management, men's vitality, women's hormonal balance, and cellular longevity.",

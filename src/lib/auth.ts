@@ -2,11 +2,14 @@ import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
 import { prisma } from "./db";
 
-const secret = process.env.SESSION_SECRET;
-if (!secret || secret.length < 32) {
-  throw new Error("SESSION_SECRET must be set to a value of at least 32 characters");
+function getJwtSecret(): string {
+  const secret = process.env.SESSION_SECRET;
+  if (!secret || secret.length < 32) {
+    throw new Error("SESSION_SECRET must be set to a value of at least 32 characters");
+  }
+  return secret;
 }
-const JWT_SECRET: string = secret;
+
 const COOKIE_NAME = "suzzmed_admin_session";
 
 export interface SessionUser {
@@ -24,14 +27,14 @@ export function signToken(user: SessionUser): string {
       email: user.email,
       role: user.role,
     },
-    JWT_SECRET,
+    getJwtSecret(),
     { expiresIn: "7d" }
   );
 }
 
 export function verifyToken(token: string): SessionUser | null {
   try {
-    return jwt.verify(token, JWT_SECRET) as SessionUser;
+    return jwt.verify(token, getJwtSecret()) as SessionUser;
   } catch {
     return null;
   }

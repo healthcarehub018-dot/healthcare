@@ -43,3 +43,6 @@ prisma/backups/
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# netlify
+.netlify
